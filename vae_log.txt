@@ -13,4 +13,16 @@ ready'go'
 ready'go'
 'go'
 ~CCn1ncc(OC(=O)[C@H](C)N2N=N[C@@H]3C=CC=C[C@H]32)c1C[NH+]1CCN(c2cnccn2)CC1~
+ready'go'
+'go'
+~CC(C)Oc1ccc(CC(=O)N[C@@H]2CCO2)cc1~
+ready'go'
+'go'
+~CC(C)N(C)c1cccc(C(O)O)c1Cl~
+ready'go'
+'go'
+~Cc1cc(OC(=O)c2cccc3nncn23)ccc1N~
+ready'go'
+'go'
+~Cc1ccccc1NC(=O)C[C@@]12C=CC=CC1=NNC(=O)[C@]2(N)c1cocc1C~
 ready
