@@ -1,0 +1,16 @@
+/anaconda/envs/jtvae/lib/python2.7/site-packages/torch/nn/functional.py:52: UserWarning: size_average and reduce args will be deprecated, please use reduction='sum' instead.
+  warnings.warn(warning.format(ret))
+ready'go'
+'go'
+/mnt/batch/tasks/shared/LS_root/mounts/clusters/rc8001/code/selectivebayes/jtnn/jtnn_dec.py:232: UserWarning: Implicit dimension choice for softmax has been deprecated. Change the call to include dim=X as an argument.
+  pred_score = nn.Softmax()(self.W_o(pred_hidden) * 20)
+/mnt/batch/tasks/shared/LS_root/mounts/clusters/rc8001/code/selectivebayes/jtnn/jtnn_vae.py:263: UserWarning: invalid index of a 0-dim tensor. This will be an error in PyTorch 0.5. Use tensor.item() to convert a 0-dim tensor to a Python number
+  return stereo_cands[max_id.data[0]]
+~C[C@]1(O)C(=O)COc2cccc([C@@H](N)c3cccc(F)c3Br)c21~
+ready'go'
+'go'
+~CCOc1ccccc1NC(=O)Cc1nc(-c2c(C)cccc2NC)no1~
+ready'go'
+'go'
+~CCn1ncc(OC(=O)[C@H](C)N2N=N[C@@H]3C=CC=C[C@H]32)c1C[NH+]1CCN(c2cnccn2)CC1~
+ready

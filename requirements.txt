@@ -1,0 +1,14 @@
+#Requirements for the working (Python 3) environment
+#A Python 2 environment named jtvae must also be made to allow interaction with jtvae which is written in Python 2
+#requirements for jtvae can be found at https://github.com/wengong-jin/icml18-jtnn
+bayesian_optimization==1.4.2
+hide_warnings==0.17
+meeko==0.4.0
+numpy==1.21.6
+pandas==1.4.2
+pexpect==4.8.0
+rdkit==2022.9.3
+scipy==1.5.3
+seaborn==0.12.2
+torch==1.12.0
+vina==1.2.3
