@@ -37,7 +37,6 @@ class vaeinterface:
         self.p=pexpect.spawn(cmd,timeout=1200,logfile=open('vae_log.txt','wb'))
     def decode(self,all_vec):
         p=self.p
-        p.expect("ready")
         tree_vec = all_vec[:,0:latent_size//2].astype("f")
         mol_vec = all_vec[:,latent_size//2:].astype("f")
         pickle.dump([tree_vec,mol_vec],open("molvec.pk1","wb"),protocol=2)
@@ -47,7 +46,6 @@ class vaeinterface:
         return mol
     def debug(self):
         p = self.p
-        p.expect("ready")
         p.sendline("'go'")
         p.expect("~.*~")
         mol=p.after.decode()[1:-1]
@@ -56,7 +54,6 @@ class vaeinterface:
         print(protmol[0])
     def encode(self,mol):
         p=self.p
-        p.expect("ready")
         p.sendline("'enc"+mol+"'")
         p.expect("done")
         all_vec = pickle.load(open("encoded.pk1","rb"),encoding="latin1")
@@ -73,11 +70,12 @@ class vaeinterface:
 
 
 class vinainterface:
-    def __init__(self,receptor,center,box_size):
+    def __init__(self,receptor,center,box_size,flex=None):
         v = vina.Vina(sf_name='vinardo', verbosity=0)
-        v.set_receptor(receptor)
+        v.set_receptor(receptor,flex_pdbqt_filename=flex)
         v.compute_vina_maps(center=center, box_size=box_size)
         self.v=v
+        self.remember_seen = True
         self.predicted = {}
         self.receptor = receptor
         self.center = center
@@ -86,11 +84,12 @@ class vinainterface:
     def predict(self,molecule,exhaustiveness):
         if molecule=="failed":
             return -5.0,-1
-        if (molecule,exhaustiveness) in self.predicted:
-            self.seen+=1
-            if (molecule,exhaustiveness*2) in self.predicted:
-                return self.predicted[(molecule,exhaustiveness*2)],1
-            return self.predicted[(molecule,exhaustiveness)],1
+        if self.remember_seen:
+            if (molecule,exhaustiveness) in self.predicted:
+                self.seen+=1
+                if (molecule,exhaustiveness*2) in self.predicted:
+                    return self.predicted[(molecule,exhaustiveness*2)],1
+                return self.predicted[(molecule,exhaustiveness)],1
         lig = rdkit.Chem.MolFromSmiles(molecule)
         protonated_lig = rdkit.Chem.AddHs(lig)
         success = rdkit.Chem.AllChem.EmbedMolecule(protonated_lig)
@@ -105,7 +104,7 @@ class vinainterface:
         lig_pdbqt = meeko_prep.write_pdbqt_string()
         v.set_ligand_from_string(lig_pdbqt)
         v.dock(exhaustiveness=exhaustiveness, n_poses=20)
-        en=np.sum(v.energies(n_poses=1)[0][1:4])
+        en=v.energies()[0][0]
         self.predicted[(molecule,exhaustiveness)]=en
         return en,1
 

@@ -1,1 +1,9 @@
 *.amltmp
+*.ipynb_aml_checkpoints
+*.pk1
+*.json
+highexhaustpredict.ipynb
+pocketsearch.ipynb
+proteinpocketclustering.ipynb
+resultanalysis.ipynb
+vae_log.txt

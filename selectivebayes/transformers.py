@@ -18,6 +18,50 @@ from bayes_opt.target_space import TargetSpace
 import sys
 from contextlib import redirect_stdout
 
+class UniformDomainReduction(DomainTransformer):
+#domain reduction by reducing the domain size by a constant reduction_rate factor each iteration and increasing the domain size by factor increase_rate when
+    #a duplicate is seen so at steady state, ~(1-reduction_rate)/(increase_rate-1) gives fraction of duplicates
+    def __init__(self, vinainter, reduction_rate = 0.99, increase_rate = 1.10):
+        self.vinainter = vinainter
+        self.reduction_rate = reduction_rate
+        self.increase_rate = increase_rate
+        
+    def initialize(self, target_space: TargetSpace):
+        self.original_bounds = np.copy(target_space.bounds)
+        self.current_optimal = np.mean(target_space.bounds, axis=1)
+        self.original_width = self.original_bounds[:,1]-self.original_bounds[:,0]
+        #set original prob
+        self.prob = 1
+        self.prev_seen = 0
+    def _create_bounds(self, parameters: dict, bounds: np.array) -> dict:
+        return {param: bounds[i, :] for i, param in enumerate(parameters)}
+    def transform(self, target_space: TargetSpace):
+        self.current_optimal = target_space.params[
+            np.argmax(target_space.target)
+        ]
+        #if the number of molecules seen has increased, increase prob by factor increase_rate, if prob is bigger than original_prob, set to original_prob
+        if self.vinainter.seen>self.prev_seen:
+            self.prob*=self.increase_rate
+            self.prob = min(self.prob,1)
+            self.prev_seen = self.vinainter.seen
+            print("SEEN")
+        else:
+            #decrease prob by factor reduction_rate
+            self.prob*=self.reduction_rate
+        self.minimum_window = np.repeat(self.current_optimal[:,None],2,axis=1)
+        self.minimum_window[:,1]+=self.prob/2*self.original_width
+        self.minimum_window[:,0]-=self.prob/2*self.original_width
+        difference_upper = self.minimum_window[:,1]-self.original_bounds[:,1]
+        difference_upper[difference_upper<0]=0
+        self.minimum_window[:,1]-=difference_upper
+        self.minimum_window[:,0]-=difference_upper
+        difference_lower = self.original_bounds[:,0]-self.minimum_window[:,0]
+        difference_lower[difference_lower<0]=0
+        self.minimum_window[:,0]+=difference_lower
+        self.minimum_window[:,1]+=difference_lower
+
+        return self._create_bounds(target_space.keys, self.minimum_window)
+
 class SequentialDomainReductionTransformer(DomainTransformer):
     """
     A sequential domain reduction transformer bassed on the work by Stander, N. and Craig, K:
@@ -127,8 +171,6 @@ class SequentialDomainReductionTransformer(DomainTransformer):
         self._trim(new_bounds, self.original_bounds)
         self.bounds.append(new_bounds)
         return self._create_bounds(target_space.keys, new_bounds)
-
-
 
 class SimpleDomainReduction(DomainTransformer):
     #domain reduction by reducing the domain size by a constant reduction_rate factor each iteration and increasing the domain size by factor increase_rate when
